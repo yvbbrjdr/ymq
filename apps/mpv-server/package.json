@@ -7,12 +7,14 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@hono/node-server": "^1.19.14",
+    "@hono/node-server": "^2.0.4",
     "dotenv": "^17.4.2",
-    "hono": "^4.12.23"
+    "hono": "^4.12.23",
+    "ws": "^8.21.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.17",
+    "@types/ws": "^8.18.1",
     "tsx": "^4.7.1",
     "typescript": "^5.8.3"
   }

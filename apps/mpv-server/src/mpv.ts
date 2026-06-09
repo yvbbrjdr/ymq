@@ -41,10 +41,10 @@ export class MPV extends EventEmitter {
       this.start();
     });
     this.mpvProcess.stdout.on("data", (data) => {
-      console.log(`[MPV stdout] ${data}`);
+      process.stdout.write(`[MPV stdout] ${data}`);
     });
     this.mpvProcess.stderr.on("data", (data) => {
-      console.error(`[MPV stderr] ${data}`);
+      process.stderr.write(`[MPV stderr] ${data}`);
     });
   }
 
@@ -57,7 +57,7 @@ export class MPV extends EventEmitter {
         resolve();
       });
       client.on("data", (data) => {
-        console.log(`[MPV IPC] ${data}`);
+        process.stdout.write(`[MPV IPC] ${data}`);
         this.emit("data", data);
       });
       client.on("error", (err) => {
@@ -76,12 +76,12 @@ export class MPV extends EventEmitter {
         return;
       } catch {
         console.error(
-          `Failed to connect to MPV IPC socket, retrying... (${i + 1}/3)`,
+          `Failed to connect to MPV IPC socket, retrying... (${i + 1}/10)`,
         );
         await new Promise((res) => setTimeout(res, 1000));
       }
     }
-    throw new Error("Failed to connect to MPV IPC socket after 3 attempts");
+    throw new Error("Failed to connect to MPV IPC socket after 10 attempts");
   }
 
   sendCommand(command: string) {
@@ -89,7 +89,7 @@ export class MPV extends EventEmitter {
       throw new Error("Not connected to MPV IPC socket");
     }
     console.log(`Sending command to MPV: ${command}`);
-    this.ipcClient.write(command + "\n");
+    this.ipcClient.write(command);
   }
 
   async stop() {
