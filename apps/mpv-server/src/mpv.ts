@@ -69,7 +69,7 @@ export class MPV extends EventEmitter {
 
   async start() {
     this.spawnMPV();
-    await new Promise((res) => setTimeout(res, 100));
+    await new Promise((res) => setTimeout(res, 500));
     for (let i = 0; i < 10; i++) {
       try {
         await this.connectToMPV();
