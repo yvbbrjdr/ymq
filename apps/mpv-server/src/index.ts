@@ -64,7 +64,7 @@ const main = async () => {
           wsClients.add(ws);
         },
         onMessage: (evt) => {
-          console.log(
+          process.stdout.write(
             `Received message from ${getRemoteAddrPort(c)}: ${evt.data}`,
           );
           mpv.sendCommand(evt.data.toString());

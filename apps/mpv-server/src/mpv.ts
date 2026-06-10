@@ -88,7 +88,7 @@ export class MPV extends EventEmitter {
     if (!this.ipcClient) {
       throw new Error("Not connected to MPV IPC socket");
     }
-    console.log(`Sending command to MPV: ${command}`);
+    process.stdout.write(`Sending command to MPV: ${command}`);
     this.ipcClient.write(command);
   }
 

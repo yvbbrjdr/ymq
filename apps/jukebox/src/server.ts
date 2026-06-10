@@ -1,20 +1,26 @@
 import { createServer } from "http";
 
+import dotenv from "dotenv";
 import next from "next";
 
-const port = parseInt(process.env.PORT || "3000", 10);
-const dev = process.env.NODE_ENV !== "production";
-const app = next({ dev });
-const handle = app.getRequestHandler();
+import { MPVClient } from "./lib/mpv-client";
 
-app.prepare().then(() => {
-  createServer((req, res) => {
-    handle(req, res);
-  }).listen(port);
+const main = async () => {
+  dotenv.config();
+
+  MPVClient.getInstance().start();
+
+  const app = next({ dev: process.env.NODE_ENV !== "production" });
+  const host = process.env.HOST || "::";
+  const port = parseInt(process.env.PORT || "3000");
+
+  await app.prepare();
+
+  createServer(app.getRequestHandler()).listen(port, host);
 
   console.log(
-    `> Server listening at http://localhost:${port} as ${
-      dev ? "development" : process.env.NODE_ENV
-    }`,
+    `MJB is running on http://${host.includes(":") ? `[${host}]` : host}:${port}`,
   );
-});
+};
+
+main();
