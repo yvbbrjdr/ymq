@@ -16,7 +16,7 @@ interface MPVEvent {
 type MPVMessage = MPVCommandResponse | MPVEvent;
 
 export class MPVClient extends EventEmitter {
-  static instance: MPVClient | null = null;
+  private static instance: MPVClient | null = null;
 
   private socket: WebSocket | null;
   private serverUrl: string;
@@ -91,14 +91,13 @@ export class MPVClient extends EventEmitter {
           console.warn(`Received unknown message from MPV server: ${line}`);
         });
     });
-    socket.on("close", async () => {
+    socket.on("close", () => {
       console.log(`MPV server connection closed, reconnecting...`);
-      await new Promise((r) => setTimeout(r, 1000));
-      this.start();
+      setTimeout(() => this.start(), 1000);
     });
   }
 
-  async sendCommand(command: (string | number)[]) {
+  private sendCommand(command: unknown[]) {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
       throw new Error("MPV server connection is not open");
     }
@@ -115,15 +114,31 @@ export class MPVClient extends EventEmitter {
     });
   }
 
+  getProperty(property: string) {
+    return this.sendCommand(["get_property", property]);
+  }
+
+  getPropertyString(property: string) {
+    return this.sendCommand(["get_property_string", property]);
+  }
+
+  setProperty(property: string, value: unknown) {
+    return this.sendCommand(["set_property", property, value]);
+  }
+
+  setPropertyString(property: string, value: string) {
+    return this.sendCommand(["set_property_string", property, value]);
+  }
+
   loadfile(url: string) {
     return this.sendCommand(["loadfile", url]);
   }
 
-  processEvent(event: MPVEvent) {
+  private processEvent(event: MPVEvent) {
     console.log(`Processing MPV event: ${JSON.stringify(event)}`);
   }
 
-  async stop() {
+  stop() {
     if (this.socket) {
       this.socket.close();
       this.socket = null;

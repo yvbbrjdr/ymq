@@ -92,7 +92,7 @@ export class MPV extends EventEmitter {
     this.ipcClient.write(command);
   }
 
-  async stop() {
+  stop() {
     if (this.ipcClient) {
       this.ipcClient.end();
       this.ipcClient = null;

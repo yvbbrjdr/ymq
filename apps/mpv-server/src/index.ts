@@ -10,7 +10,7 @@ import { getRemoteAddrPort } from "./utils.js";
 
 const teardown = async (mpv: MPV) => {
   console.log("Shutting down MPV Server...");
-  await mpv.stop();
+  mpv.stop();
   console.log("MPV Server has been shut down.");
   process.exit(0);
 };
