@@ -134,15 +134,38 @@ export class MPVClient extends EventEmitter {
     return this.sendCommand(["loadfile", url]);
   }
 
+  pause() {
+    return this.setProperty("pause", true);
+  }
+
+  play() {
+    return this.setProperty("pause", false);
+  }
+
+  stop() {
+    return this.sendCommand(["stop"]);
+  }
+
   private processEvent(event: MPVEvent) {
     console.log(`Processing MPV event: ${JSON.stringify(event)}`);
   }
 
-  stop() {
+  destroy() {
     if (this.socket) {
+      this.socket.removeAllListeners();
       this.socket.close();
       this.socket = null;
     }
+    this.inflightCommands.forEach(({ reject }) => {
+      reject("MPV client destroyed");
+    });
+    this.inflightCommands.clear();
+    this.commandCounter = 0;
+  }
+
+  reconnect() {
+    this.destroy();
+    this.start();
   }
 
   static getInstance() {
