@@ -13,6 +13,15 @@ interface MPVEvent {
   [key: string]: unknown;
 }
 
+interface MPVStatus {
+  idle: boolean;
+  playing: boolean;
+  duration: number;
+  position: number;
+  volume: number;
+  muted: boolean;
+}
+
 type MPVMessage = MPVCommandResponse | MPVEvent;
 
 export class MPVClient extends EventEmitter {
@@ -26,6 +35,7 @@ export class MPVClient extends EventEmitter {
     number,
     { resolve: (value: unknown) => void; reject: (reason?: string) => void }
   >;
+  private status!: MPVStatus;
 
   constructor() {
     super();
@@ -34,6 +44,7 @@ export class MPVClient extends EventEmitter {
     this.serverApiKey = process.env.MPV_SERVER_API_KEY || "your-api-key-here";
     this.commandCounter = 0;
     this.inflightCommands = new Map();
+    this.resetStatus();
   }
 
   start() {
@@ -46,6 +57,16 @@ export class MPVClient extends EventEmitter {
     socket.on("open", () => {
       console.log(`Connected to MPV server at ${this.serverUrl}`);
       this.socket = socket;
+      this.unobserveProperty(1);
+      this.unobserveProperty(2);
+      this.unobserveProperty(3);
+      this.unobserveProperty(4);
+      this.unobserveProperty(5);
+      this.observeProperty("pause", 1);
+      this.observeProperty("duration", 2);
+      this.observeProperty("time-pos", 3);
+      this.observeProperty("volume", 4);
+      this.observeProperty("mute", 5);
     });
     socket.on("error", (err) => {
       console.error(`Failed to connect to MPV server: ${err}`);
@@ -130,6 +151,14 @@ export class MPVClient extends EventEmitter {
     return this.sendCommand(["set_property_string", property, value]);
   }
 
+  private observeProperty(property: string, id: number) {
+    return this.sendCommand(["observe_property", id, property]);
+  }
+
+  private unobserveProperty(id: number) {
+    return this.sendCommand(["unobserve_property", id]);
+  }
+
   loadfile(url: string) {
     return this.sendCommand(["loadfile", url]);
   }
@@ -147,7 +176,39 @@ export class MPVClient extends EventEmitter {
   }
 
   private processEvent(event: MPVEvent) {
-    console.log(`Processing MPV event: ${JSON.stringify(event)}`);
+    switch (event.event) {
+      case "playback-restart":
+        this.updateStatus({ idle: false });
+        break;
+      case "end-file":
+      case "idle":
+        this.updateStatus({
+          idle: true,
+          playing: false,
+          position: 0,
+          duration: 0,
+        });
+        break;
+      case "property-change":
+        switch (event.name) {
+          case "pause":
+            this.updateStatus({ playing: event.data === false });
+            break;
+          case "duration":
+            this.updateStatus({ duration: (event.data ?? 0) as number });
+            break;
+          case "time-pos":
+            this.updateStatus({ position: (event.data ?? 0) as number });
+            break;
+          case "volume":
+            this.updateStatus({ volume: (event.data ?? 100) as number });
+            break;
+          case "mute":
+            this.updateStatus({ muted: (event.data ?? false) as boolean });
+            break;
+        }
+        break;
+    }
   }
 
   destroy() {
@@ -161,11 +222,28 @@ export class MPVClient extends EventEmitter {
     });
     this.inflightCommands.clear();
     this.commandCounter = 0;
+    this.resetStatus();
   }
 
   reconnect() {
     this.destroy();
     this.start();
+  }
+
+  private updateStatus(status: Partial<MPVStatus>) {
+    this.status = { ...this.status, ...status };
+    this.emit("status", this.status);
+  }
+
+  private resetStatus() {
+    this.updateStatus({
+      idle: true,
+      playing: false,
+      duration: 0,
+      position: 0,
+      volume: 100,
+      muted: false,
+    });
   }
 
   static getInstance() {
