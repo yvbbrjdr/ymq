@@ -135,19 +135,19 @@ export class MPVClient extends EventEmitter {
     });
   }
 
-  getProperty(property: string) {
+  private getProperty(property: string) {
     return this.sendCommand(["get_property", property]);
   }
 
-  getPropertyString(property: string) {
+  private getPropertyString(property: string) {
     return this.sendCommand(["get_property_string", property]);
   }
 
-  setProperty(property: string, value: unknown) {
+  private setProperty(property: string, value: unknown) {
     return this.sendCommand(["set_property", property, value]);
   }
 
-  setPropertyString(property: string, value: string) {
+  private setPropertyString(property: string, value: string) {
     return this.sendCommand(["set_property_string", property, value]);
   }
 
@@ -173,6 +173,18 @@ export class MPVClient extends EventEmitter {
 
   stop() {
     return this.sendCommand(["stop"]);
+  }
+
+  seek(position: number) {
+    return this.sendCommand(["seek", position, "absolute"]);
+  }
+
+  setVolume(volume: number) {
+    return this.setProperty("volume", volume);
+  }
+
+  setMuted(muted: boolean) {
+    return this.setProperty("mute", muted);
   }
 
   private processEvent(event: MPVEvent) {

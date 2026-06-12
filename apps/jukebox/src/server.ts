@@ -8,7 +8,8 @@ import { MPVClient } from "./lib/mpv-client";
 const main = async () => {
   dotenv.config();
 
-  MPVClient.getInstance().start();
+  const mpv = MPVClient.getInstance();
+  mpv.start();
 
   const app = next({ dev: process.env.NODE_ENV !== "production" });
   const host = process.env.HOST || "::";
