@@ -15,7 +15,7 @@ interface MPVEvent {
 
 interface MPVStatus {
   idle: boolean;
-  playing: boolean;
+  pause: boolean;
   duration: number;
   position: number;
   volume: number;
@@ -184,7 +184,7 @@ export class MPVClient extends EventEmitter {
       case "idle":
         this.updateStatus({
           idle: true,
-          playing: false,
+          pause: false,
           position: 0,
           duration: 0,
         });
@@ -192,7 +192,7 @@ export class MPVClient extends EventEmitter {
       case "property-change":
         switch (event.name) {
           case "pause":
-            this.updateStatus({ playing: event.data === false });
+            this.updateStatus({ pause: (event.data ?? false) as boolean });
             break;
           case "duration":
             this.updateStatus({ duration: (event.data ?? 0) as number });
@@ -238,7 +238,7 @@ export class MPVClient extends EventEmitter {
   private resetStatus() {
     this.updateStatus({
       idle: true,
-      playing: false,
+      pause: false,
       duration: 0,
       position: 0,
       volume: 100,
