@@ -38,6 +38,7 @@ export class MPV extends EventEmitter {
     });
     this.mpvProcess.on("close", (code) => {
       console.log(`MPV process exited with code ${code}, restarting...`);
+      this.emit("data", JSON.stringify({ event: "mpv-server:exited", code }));
       this.start();
     });
     this.mpvProcess.stderr.on("data", (data) => {
@@ -51,6 +52,7 @@ export class MPV extends EventEmitter {
       const client = net.createConnection(this.socketPath, () => {
         console.log(`Connected to MPV IPC socket at ${this.socketPath}`);
         this.ipcClient = client;
+        this.emit("data", JSON.stringify({ event: "mpv-server:connected" }));
         resolve();
       });
       client.on("data", (data) => {

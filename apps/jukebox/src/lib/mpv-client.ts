@@ -57,16 +57,7 @@ export class MPVClient extends EventEmitter {
     socket.on("open", () => {
       console.log(`Connected to MPV server at ${this.serverUrl}`);
       this.socket = socket;
-      this.unobserveProperty(1);
-      this.unobserveProperty(2);
-      this.unobserveProperty(3);
-      this.unobserveProperty(4);
-      this.unobserveProperty(5);
-      this.observeProperty("pause", 1);
-      this.observeProperty("duration", 2);
-      this.observeProperty("time-pos", 3);
-      this.observeProperty("volume", 4);
-      this.observeProperty("mute", 5);
+      this.setupObservers();
     });
     socket.on("error", (err) => {
       console.error(`Failed to connect to MPV server: ${err}`);
@@ -115,6 +106,19 @@ export class MPVClient extends EventEmitter {
       console.log(`MPV server connection closed, reconnecting...`);
       setTimeout(() => this.start(), 1000);
     });
+  }
+
+  private setupObservers() {
+    this.unobserveProperty(1);
+    this.unobserveProperty(2);
+    this.unobserveProperty(3);
+    this.unobserveProperty(4);
+    this.unobserveProperty(5);
+    this.observeProperty("pause", 1);
+    this.observeProperty("duration", 2);
+    this.observeProperty("time-pos", 3);
+    this.observeProperty("volume", 4);
+    this.observeProperty("mute", 5);
   }
 
   private sendCommand(command: unknown[]) {
@@ -199,6 +203,12 @@ export class MPVClient extends EventEmitter {
           position: 0,
           duration: 0,
         });
+        break;
+      case "mpv-server:exited":
+        this.resetStatus();
+        break;
+      case "mpv-server:connected":
+        this.setupObservers();
         break;
       case "property-change":
         switch (event.name) {
