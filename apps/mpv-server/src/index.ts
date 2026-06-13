@@ -35,9 +35,6 @@ const main = async () => {
 
   mpv.on("data", (data) => {
     const message = data.toString();
-    process.stdout.write(
-      `Broadcasting message to ${wsClients.size} WebSocket clients: ${message}`,
-    );
     for (const ws of wsClients) {
       if (ws.readyState === 1) {
         ws.send(message);

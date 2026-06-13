@@ -72,7 +72,6 @@ export class MPVClient extends EventEmitter {
       console.error(`Failed to connect to MPV server: ${err}`);
     });
     socket.on("message", (data) => {
-      process.stdout.write(`Received message from MPV server: ${data}`);
       data
         .toString()
         .split("\n")

@@ -8,7 +8,7 @@ export class MPV extends EventEmitter {
   private socketPath: string;
   private mpvProcess: child_process.ChildProcessByStdio<
     null,
-    Stream.Readable,
+    null,
     Stream.Readable
   > | null;
   private ipcClient: net.Socket | null;
@@ -29,7 +29,7 @@ export class MPV extends EventEmitter {
       this.binaryPath,
       ["--idle=yes", "--input-ipc-server=" + this.socketPath],
       {
-        stdio: ["ignore", "pipe", "pipe"],
+        stdio: ["ignore", "ignore", "pipe"],
       },
     );
     this.mpvProcess.on("error", (err) => {
@@ -39,9 +39,6 @@ export class MPV extends EventEmitter {
     this.mpvProcess.on("close", (code) => {
       console.log(`MPV process exited with code ${code}, restarting...`);
       this.start();
-    });
-    this.mpvProcess.stdout.on("data", (data) => {
-      process.stdout.write(`[MPV stdout] ${data}`);
     });
     this.mpvProcess.stderr.on("data", (data) => {
       process.stderr.write(`[MPV stderr] ${data}`);
@@ -57,7 +54,6 @@ export class MPV extends EventEmitter {
         resolve();
       });
       client.on("data", (data) => {
-        process.stdout.write(`[MPV IPC] ${data}`);
         this.emit("data", data);
       });
       client.on("error", (err) => {
@@ -88,7 +84,6 @@ export class MPV extends EventEmitter {
     if (!this.ipcClient) {
       throw new Error("Not connected to MPV IPC socket");
     }
-    process.stdout.write(`Sending command to MPV: ${command}`);
     this.ipcClient.write(command);
   }
 
