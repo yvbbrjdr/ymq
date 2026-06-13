@@ -135,6 +135,12 @@ export class MPVClient extends EventEmitter {
     );
     return new Promise((resolve, reject) => {
       this.inflightCommands.set(requestId, { resolve, reject });
+      setTimeout(() => {
+        if (this.inflightCommands.has(requestId)) {
+          this.inflightCommands.delete(requestId);
+          reject("MPV command timed out");
+        }
+      }, 1000);
     });
   }
 
