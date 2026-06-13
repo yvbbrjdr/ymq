@@ -89,9 +89,9 @@ export class MPV extends EventEmitter {
     this.ipcClient.write(command);
   }
 
-  stop() {
+  async stop() {
     if (this.ipcClient) {
-      this.ipcClient.end();
+      await new Promise<void>((resolve) => this.ipcClient!.end(resolve));
       this.ipcClient = null;
       console.log("Disconnected from MPV IPC socket");
     }
