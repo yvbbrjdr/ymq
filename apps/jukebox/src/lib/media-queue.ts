@@ -23,8 +23,8 @@ export interface MediaQueueStatus {
 export class MediaQueue extends EventEmitter {
   private static instance: MediaQueue | null = null;
 
-  private status: MediaQueueStatus;
   private mpvIdle: boolean;
+  status: MediaQueueStatus;
 
   private constructor() {
     super();

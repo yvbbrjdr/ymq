@@ -35,7 +35,7 @@ export class MPVClient extends EventEmitter {
     number,
     { resolve: (value: unknown) => void; reject: (reason?: string) => void }
   >;
-  private status!: MPVStatus;
+  status!: MPVStatus;
 
   private constructor() {
     super();

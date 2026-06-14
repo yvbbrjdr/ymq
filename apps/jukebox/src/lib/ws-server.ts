@@ -4,6 +4,7 @@ import { type WebSocket, WebSocketServer } from "ws";
 
 import type { WsMessage } from "../types/ws-message";
 import { MediaQueue } from "./media-queue";
+import { MPVClient } from "./mpv-client";
 
 class WsConnection {
   private ws: WebSocket;
@@ -17,6 +18,22 @@ class WsConnection {
       : (req.socket.remoteAddress ?? "");
     this.remotePort = req.socket.remotePort ?? 0;
     this.ws.on("message", (data) => this.messageReceived(data.toString()));
+
+    const mediaQueue = MediaQueue.getInstance();
+    const mpv = MPVClient.getInstance();
+
+    this.sendMessage(
+      JSON.stringify({
+        type: "media-queue/status",
+        data: mediaQueue.status,
+      }),
+    );
+    this.sendMessage(
+      JSON.stringify({
+        type: "player/status",
+        data: mpv.status,
+      }),
+    );
   }
 
   private messageReceived(message: string) {
@@ -25,6 +42,7 @@ class WsConnection {
     );
 
     const mediaQueue = MediaQueue.getInstance();
+    const mpv = MPVClient.getInstance();
 
     let parsedMessage: WsMessage;
     try {
@@ -45,6 +63,27 @@ class WsConnection {
           parsedMessage.data.username,
           parsedMessage.data.index,
         );
+        break;
+      case "media-queue/play-next":
+        mediaQueue.playNext();
+        break;
+      case "player/pause":
+        mpv.pause();
+        break;
+      case "player/play":
+        mpv.play();
+        break;
+      case "player/stop":
+        mpv.stop();
+        break;
+      case "player/seek":
+        mpv.seek(parsedMessage.data.position);
+        break;
+      case "player/set-volume":
+        mpv.setVolume(parsedMessage.data.volume);
+        break;
+      case "player/set-muted":
+        mpv.setMuted(parsedMessage.data.muted);
         break;
     }
   }
@@ -87,6 +126,26 @@ export class WsServer {
         console.error(`Error from ${connection.getRemoteAddrPort()}: ${error}`);
         this.connections.splice(this.connections.indexOf(connection), 1);
       });
+    });
+
+    const mediaQueue = MediaQueue.getInstance();
+    const mpv = MPVClient.getInstance();
+
+    mediaQueue.on("status", (status) => {
+      this.broadcastMessage(
+        JSON.stringify({
+          type: "media-queue/status",
+          data: status,
+        }),
+      );
+    });
+    mpv.on("status", (status) => {
+      this.broadcastMessage(
+        JSON.stringify({
+          type: "player/status",
+          data: status,
+        }),
+      );
     });
   }
 
