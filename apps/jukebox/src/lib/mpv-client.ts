@@ -196,6 +196,10 @@ export class MPVClient extends EventEmitter {
     return this.setProperty("mute", muted);
   }
 
+  setFullscreen(fullscreen: boolean) {
+    return this.setProperty("fullscreen", fullscreen ? "yes" : "no");
+  }
+
   private processEvent(event: MPVEvent) {
     switch (event.event) {
       case "playback-restart":
