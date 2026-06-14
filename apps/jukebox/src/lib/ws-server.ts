@@ -2,6 +2,9 @@ import type { IncomingMessage, Server } from "http";
 
 import { type WebSocket, WebSocketServer } from "ws";
 
+import type { WsMessage } from "../types/ws-message";
+import { MediaQueue } from "./media-queue";
+
 class WsConnection {
   private ws: WebSocket;
   private remoteAddress: string;
@@ -20,6 +23,30 @@ class WsConnection {
     console.log(
       `Received message from ${this.getRemoteAddrPort()}: ${message}`,
     );
+
+    const mediaQueue = MediaQueue.getInstance();
+
+    let parsedMessage: WsMessage;
+    try {
+      parsedMessage = JSON.parse(message);
+    } catch (error) {
+      console.error(
+        `Failed to parse message from ${this.getRemoteAddrPort()}: ${error}`,
+      );
+      return;
+    }
+
+    switch (parsedMessage.type) {
+      case "media-queue/enqueue":
+        mediaQueue.enqueue(parsedMessage.data.username, parsedMessage.data.url);
+        break;
+      case "media-queue/remove":
+        mediaQueue.remove(
+          parsedMessage.data.username,
+          parsedMessage.data.index,
+        );
+        break;
+    }
   }
 
   sendMessage(message: string) {
