@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import next from "next";
 
 import { MPVClient } from "./lib/mpv-client";
+import { WsServer } from "./lib/ws-server";
 
 const main = async () => {
   dotenv.config();
@@ -17,11 +18,14 @@ const main = async () => {
 
   await app.prepare();
 
-  createServer(app.getRequestHandler()).listen(port, host);
-
-  console.log(
-    `MJB is running on http://${host.includes(":") ? `[${host}]` : host}:${port}`,
-  );
+  const server = createServer(app.getRequestHandler());
+  const wsServer = WsServer.getInstance();
+  wsServer.start(server);
+  server.listen(port, host, undefined, () => {
+    console.log(
+      `MJB is running on http://${host.includes(":") ? `[${host}]` : host}:${port}`,
+    );
+  });
 };
 
 main();

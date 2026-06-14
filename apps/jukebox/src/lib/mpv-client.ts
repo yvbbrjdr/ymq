@@ -37,7 +37,7 @@ export class MPVClient extends EventEmitter {
   >;
   private status!: MPVStatus;
 
-  constructor() {
+  private constructor() {
     super();
     this.socket = null;
     this.serverUrl = process.env.MPV_SERVER_URL || "ws://localhost:8678/ws";
