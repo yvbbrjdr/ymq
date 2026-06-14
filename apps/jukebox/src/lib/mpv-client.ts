@@ -13,7 +13,7 @@ interface MPVEvent {
   [key: string]: unknown;
 }
 
-interface MPVStatus {
+export interface MPVStatus {
   idle: boolean;
   pause: boolean;
   duration: number;

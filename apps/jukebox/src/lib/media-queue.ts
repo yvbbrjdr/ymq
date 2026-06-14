@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 
-import { MPVClient } from "./mpv-client";
+import { MPVClient, MPVStatus } from "./mpv-client";
 
 export interface MediaItem {
   title: string;
@@ -24,6 +24,7 @@ export class MediaQueue extends EventEmitter {
   private static instance: MediaQueue | null = null;
 
   private status: MediaQueueStatus;
+  private mpvIdle: boolean;
 
   private constructor() {
     super();
@@ -31,9 +32,18 @@ export class MediaQueue extends EventEmitter {
       nowPlaying: null,
       queues: [],
     };
+    this.mpvIdle = true;
   }
 
-  start() {}
+  start() {
+    const mpv = MPVClient.getInstance();
+    mpv.on("status", (status: MPVStatus) => {
+      if (!this.mpvIdle && status.idle) {
+        this.playNext();
+      }
+      this.mpvIdle = status.idle;
+    });
+  }
 
   async enqueue(username: string, url: string) {
     let queue = this.status.queues.find((q) => q.username === username);

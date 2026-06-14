@@ -2,7 +2,7 @@ import type { IncomingMessage, Server } from "http";
 
 import { type WebSocket, WebSocketServer } from "ws";
 
-export class WsConnection {
+class WsConnection {
   private ws: WebSocket;
   private remoteAddress: string;
   private remotePort: number;
