@@ -58,7 +58,7 @@ export class MediaQueue extends EventEmitter {
       addedAt: new Date(),
       addedBy: username,
     });
-    this.emit("update", this.status);
+    this.emit("status", this.status);
     if (!this.status.nowPlaying) {
       await this.playNext();
     }
@@ -80,7 +80,7 @@ export class MediaQueue extends EventEmitter {
     await mpv.loadfile(this.status.nowPlaying.url);
     await mpv.play();
     await mpv.setFullscreen(true);
-    this.emit("update", this.status);
+    this.emit("status", this.status);
   }
 
   remove(username: string, index: number) {
@@ -95,7 +95,7 @@ export class MediaQueue extends EventEmitter {
     if (queue.queue.length === 0) {
       this.status.queues.splice(this.status.queues.indexOf(queue), 1);
     }
-    this.emit("update", this.status);
+    this.emit("status", this.status);
   }
 
   static getInstance() {
