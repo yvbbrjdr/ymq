@@ -71,6 +71,9 @@ importers:
       ws:
         specifier: ^8.21.0
         version: 8.21.0
+      ytdlp-nodejs:
+        specifier: ^3.4.4
+        version: 3.4.4
     devDependencies:
       '@tailwindcss/postcss':
         specifier: ^4
@@ -2202,6 +2205,11 @@ packages:
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+  ytdlp-nodejs@3.4.4:
+    resolution: {integrity: sha512-PR2nQOtyOzSuSQpWf6SHD97d6qlcfY2y6CVCeYnuDacYDc1YzNLXYiqAyIpFWk13UUrtQN+XD35h5DERli3SXQ==}
+    engines: {node: '>=16.0.0'}
+    hasBin: true
 
 snapshots:
 
@@ -4373,3 +4381,5 @@ snapshots:
       yargs-parser: 22.0.0
 
   yocto-queue@0.1.0: {}
+
+  ytdlp-nodejs@3.4.4: {}

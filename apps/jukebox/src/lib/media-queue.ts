@@ -1,6 +1,7 @@
 import { EventEmitter } from "events";
 
 import { MPVClient, MPVStatus } from "./mpv-client";
+import { getMediaMetadata } from "./utils";
 
 export interface MediaItem {
   title: string;
@@ -51,9 +52,10 @@ export class MediaQueue extends EventEmitter {
       queue = { username, queue: [] };
       this.status.queues.push(queue);
     }
+    const metadata = await getMediaMetadata(url);
     queue.queue.push({
-      title: "Unknown",
-      thumbnail: "",
+      title: metadata.title,
+      thumbnail: metadata.thumbnail,
       url,
       addedAt: new Date(),
       addedBy: username,
