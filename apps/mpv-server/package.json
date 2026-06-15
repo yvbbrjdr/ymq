@@ -1,5 +1,5 @@
 {
-  "name": "@mjb/mpv-server",
+  "name": "@ymq/mpv-server",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",

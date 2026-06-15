@@ -1,4 +1,4 @@
-# @mjb/mpv-server
+# @ymq/mpv-server
 
 ```
 npm install

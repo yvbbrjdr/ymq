@@ -1,7 +1,7 @@
 {
-  "name": "mjb",
+  "name": "ymq",
   "version": "1.0.0",
-  "description": "Jukebox based on MPV",
+  "description": "yv's media queue",
   "type": "module",
   "scripts": {
     "lint": "eslint .",

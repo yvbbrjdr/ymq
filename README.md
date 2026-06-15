@@ -1,3 +1,3 @@
-# mjb
+# ymq
 
-Jukebox based on MPV
+yv's media queue

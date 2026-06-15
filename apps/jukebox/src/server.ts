@@ -27,7 +27,7 @@ const main = async () => {
   wsServer.start(server, app.getUpgradeHandler());
   server.listen(port, host, undefined, () => {
     console.log(
-      `MJB is running on http://${host.includes(":") ? `[${host}]` : host}:${port}`,
+      `YMQ Jukebox is running on http://${host.includes(":") ? `[${host}]` : host}:${port}`,
     );
   });
 };
