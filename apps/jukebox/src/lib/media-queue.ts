@@ -1,7 +1,7 @@
 import { EventEmitter } from "events";
 
+import { getMediaMetadata } from "./media-utils";
 import { MPVClient } from "./mpv-client";
-import { getMediaMetadata } from "./utils";
 
 export interface MediaItem {
   title: string;
