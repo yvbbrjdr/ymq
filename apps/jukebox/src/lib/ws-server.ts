@@ -66,14 +66,14 @@ class WsConnection {
           parsedMessage.data.index,
         );
         break;
+      case "media-queue/play-next":
+        mediaQueue.playNext();
+        break;
       case "player/pause":
         mpv.pause();
         break;
       case "player/play":
         mpv.play();
-        break;
-      case "player/stop":
-        mpv.stop();
         break;
       case "player/seek":
         mpv.seek(parsedMessage.data.position);

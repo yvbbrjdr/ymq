@@ -206,6 +206,8 @@ export class MPVClient extends EventEmitter {
         this.updateStatus({ idle: false });
         break;
       case "end-file":
+        this.emit("end-file", event.reason);
+      // eslint-disable-next-line no-fallthrough
       case "idle":
         this.updateStatus({
           idle: true,

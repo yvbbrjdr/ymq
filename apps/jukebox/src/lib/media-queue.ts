@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 
-import { MPVClient, MPVStatus } from "./mpv-client";
+import { MPVClient } from "./mpv-client";
 import { getMediaMetadata } from "./utils";
 
 export interface MediaItem {
@@ -24,8 +24,8 @@ export interface MediaQueueStatus {
 export class MediaQueue extends EventEmitter {
   private static instance: MediaQueue | null = null;
 
-  private mpvIdle: boolean;
   status: MediaQueueStatus;
+  private playingNext: boolean;
 
   private constructor() {
     super();
@@ -33,16 +33,15 @@ export class MediaQueue extends EventEmitter {
       nowPlaying: null,
       queues: [],
     };
-    this.mpvIdle = true;
+    this.playingNext = false;
   }
 
   start() {
     const mpv = MPVClient.getInstance();
-    mpv.on("status", (status: MPVStatus) => {
-      if (!this.mpvIdle && status.idle) {
+    mpv.on("end-file", (reason: string) => {
+      if (reason !== "stop") {
         this.playNext();
       }
-      this.mpvIdle = status.idle;
     });
   }
 
@@ -67,23 +66,32 @@ export class MediaQueue extends EventEmitter {
   }
 
   async playNext() {
-    const mpv = MPVClient.getInstance();
-
-    this.status.nowPlaying = null;
-    await mpv.stop();
-    if (this.status.queues.length === 0) {
-      this.emit("status", this.status);
+    if (this.playingNext) {
       return;
     }
-    const queue = this.status.queues.shift()!;
-    this.status.nowPlaying = queue.queue.shift()!;
-    if (queue.queue.length > 0) {
-      this.status.queues.push(queue);
+    this.playingNext = true;
+
+    try {
+      const mpv = MPVClient.getInstance();
+
+      this.status.nowPlaying = null;
+      this.emit("status", this.status);
+      await mpv.stop();
+      if (this.status.queues.length === 0) {
+        return;
+      }
+      await mpv.loadfile(this.status.queues[0].queue[0].url);
+      await mpv.play();
+      await mpv.setFullscreen(true);
+      const queue = this.status.queues.shift()!;
+      this.status.nowPlaying = queue.queue.shift()!;
+      if (queue.queue.length > 0) {
+        this.status.queues.push(queue);
+      }
+      this.emit("status", this.status);
+    } finally {
+      this.playingNext = false;
     }
-    await mpv.loadfile(this.status.nowPlaying.url);
-    await mpv.play();
-    await mpv.setFullscreen(true);
-    this.emit("status", this.status);
   }
 
   remove(username: string, index: number) {
