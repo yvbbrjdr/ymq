@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 
 import { WsClient } from "../lib/ws-client";
 
 export default function Home() {
-  const wsClient = useMemo(() => WsClient.getInstance(), []);
+  const wsClient = WsClient.getInstance();
 
   useEffect(() => {
     wsClient.start();
