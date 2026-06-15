@@ -1,3 +1,5 @@
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 import { YtDlp } from "ytdlp-nodejs";
 
 export interface MediaMetadata {
@@ -24,3 +26,7 @@ export const getMediaMetadata = async (url: string): Promise<MediaMetadata> => {
     };
   }
 };
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
