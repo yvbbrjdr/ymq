@@ -1,5 +1,7 @@
 import type { IncomingMessage, Server } from "http";
+import type { Duplex } from "stream";
 
+import type { UpgradeHandler } from "next/dist/server/next";
 import { type WebSocket, WebSocketServer } from "ws";
 
 import type { WsMessage } from "../types/ws-message";
@@ -108,8 +110,17 @@ export class WsServer {
     this.connections = [];
   }
 
-  start(httpServer: Server) {
-    this.server = new WebSocketServer({ server: httpServer, path: "/ws" });
+  start(httpServer: Server, nextUpgradeHandler: UpgradeHandler) {
+    this.server = new WebSocketServer({ noServer: true });
+    httpServer.on("upgrade", (req, socket, head) => {
+      if (req.url === "/ws") {
+        this.handleUpgrade(req, socket, head);
+        return;
+      }
+
+      nextUpgradeHandler(req, socket, head);
+    });
+
     this.server.on("connection", (ws: WebSocket, req: IncomingMessage) => {
       const connection = new WsConnection(ws, req);
       console.log(
@@ -146,6 +157,16 @@ export class WsServer {
           data: status,
         }),
       );
+    });
+  }
+
+  handleUpgrade(req: IncomingMessage, socket: Duplex, head: Buffer) {
+    if (!this.server) {
+      throw new Error("WebSocket server not started");
+    }
+
+    this.server.handleUpgrade(req, socket, head, (ws) => {
+      this.server?.emit("connection", ws, req);
     });
   }
 

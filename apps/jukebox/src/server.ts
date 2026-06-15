@@ -24,7 +24,7 @@ const main = async () => {
 
   const server = createServer(app.getRequestHandler());
   const wsServer = WsServer.getInstance();
-  wsServer.start(server);
+  wsServer.start(server, app.getUpgradeHandler());
   server.listen(port, host, undefined, () => {
     console.log(
       `MJB is running on http://${host.includes(":") ? `[${host}]` : host}:${port}`,

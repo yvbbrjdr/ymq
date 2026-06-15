@@ -1,25 +1,35 @@
-import { EventEmitter } from "events";
-
-import { WebSocket } from "ws";
-
 import type { WsMessage } from "../types/ws-message";
 
-export class WsClient extends EventEmitter {
+export class WsClient extends EventTarget {
   private static instance: WsClient | null = null;
 
   private ws: WebSocket | null;
+  private boundOnMessage: (event: MessageEvent) => void;
+  private boundOnClose: () => void;
 
   private constructor() {
     super();
     this.ws = null;
+    this.boundOnMessage = this.onMessage.bind(this);
+    this.boundOnClose = this.onClose.bind(this);
   }
 
   start() {
     this.ws = new WebSocket("/ws");
-    this.ws.on("message", (data) => {
-      const parsedMessage: WsMessage = JSON.parse(data.toString());
-      this.emit(parsedMessage.type, parsedMessage.data);
-    });
+    this.ws.addEventListener("message", this.boundOnMessage);
+    this.ws.addEventListener("close", this.boundOnClose);
+  }
+
+  private onMessage(event: MessageEvent) {
+    const parsedMessage: WsMessage = JSON.parse(event.data.toString());
+    this.dispatchEvent(
+      new CustomEvent(parsedMessage.type, { detail: parsedMessage.data }),
+    );
+  }
+
+  private async onClose() {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    this.start();
   }
 
   private sendMessage(message: WsMessage) {
@@ -90,6 +100,15 @@ export class WsClient extends EventEmitter {
       type: "player/set-muted",
       data: { muted },
     });
+  }
+
+  destroy() {
+    if (this.ws) {
+      this.ws.removeEventListener("message", this.boundOnMessage);
+      this.ws.removeEventListener("close", this.boundOnClose);
+      this.ws.close();
+      this.ws = null;
+    }
   }
 
   static getInstance() {
