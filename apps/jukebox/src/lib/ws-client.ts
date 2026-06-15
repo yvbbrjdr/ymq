@@ -53,13 +53,6 @@ export class WsClient extends EventTarget {
     });
   }
 
-  playNext() {
-    this.sendMessage({
-      type: "media-queue/play-next",
-      data: {},
-    });
-  }
-
   pause() {
     this.sendMessage({
       type: "player/pause",

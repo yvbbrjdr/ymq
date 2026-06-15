@@ -66,9 +66,6 @@ class WsConnection {
           parsedMessage.data.index,
         );
         break;
-      case "media-queue/play-next":
-        mediaQueue.playNext();
-        break;
       case "player/pause":
         mpv.pause();
         break;

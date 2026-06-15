@@ -17,11 +17,6 @@ export interface WsMediaQueueRemoveMessage {
   };
 }
 
-export interface WsMediaQueuePlayNextMessage {
-  type: "media-queue/play-next";
-  data: Record<string, never>;
-}
-
 export interface WsMediaQueueStatusMessage {
   type: "media-queue/status";
   data: MediaQueueStatus;
@@ -71,7 +66,6 @@ export interface WsPlayerStatusMessage {
 export type WsMessage =
   | WsMediaQueueEnqueueMessage
   | WsMediaQueueRemoveMessage
-  | WsMediaQueuePlayNextMessage
   | WsMediaQueueStatusMessage
   | WsPlayerPauseMessage
   | WsPlayerPlayMessage
