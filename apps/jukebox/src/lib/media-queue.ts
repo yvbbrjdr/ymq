@@ -70,6 +70,7 @@ export class MediaQueue extends EventEmitter {
     this.status.nowPlaying = null;
     await mpv.stop();
     if (this.status.queues.length === 0) {
+      this.emit("status", this.status);
       return;
     }
     const queue = this.status.queues.shift()!;
