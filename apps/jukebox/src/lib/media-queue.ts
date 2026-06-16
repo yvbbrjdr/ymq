@@ -4,9 +4,9 @@ import { getMediaMetadata } from "./media-utils";
 import { MPVClient } from "./mpv-client";
 
 export interface MediaItem {
-  title: string;
-  channel: string;
-  thumbnail: string;
+  title?: string;
+  channel?: string;
+  thumbnail?: string;
   url: string;
   addedAt: Date;
   addedBy: string;
@@ -54,9 +54,7 @@ export class MediaQueue extends EventEmitter {
     }
     const metadata = await getMediaMetadata(url);
     queue.queue.push({
-      title: metadata.title,
-      channel: metadata.channel,
-      thumbnail: metadata.thumbnail,
+      ...metadata,
       url,
       addedAt: new Date(),
       addedBy: username,

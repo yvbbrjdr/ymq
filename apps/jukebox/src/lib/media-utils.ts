@@ -1,22 +1,16 @@
 import child_process from "child_process";
 
-export interface MediaMetadata {
-  title: string;
-  channel: string;
-  thumbnail: string;
-}
+import { MediaItem } from "./media-queue";
 
-export const getMediaMetadata = async (url: string): Promise<MediaMetadata> => {
+export const getMediaMetadata = async (
+  url: string,
+): Promise<Partial<MediaItem>> => {
   return new Promise((resolve) => {
     child_process.exec(
       `yt-dlp -O title -O channel -O thumbnail ${url}`,
       (error, stdout) => {
         if (error) {
-          resolve({
-            title: "Unknown",
-            channel: "Unknown",
-            thumbnail: "",
-          });
+          resolve({});
           return;
         }
         const lines = stdout.split("\n");
