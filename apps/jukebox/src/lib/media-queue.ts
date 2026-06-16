@@ -5,8 +5,13 @@ import { MPVClient } from "./mpv-client";
 
 export interface MediaItem {
   title?: string;
+  description?: string;
   channel?: string;
+  channelUrl?: string;
   thumbnail?: string;
+  duration?: number;
+  viewCount?: number;
+  timestamp?: number;
   url: string;
   addedAt: Date;
   addedBy: string;

@@ -7,17 +7,22 @@ export const getMediaMetadata = async (
 ): Promise<Partial<MediaItem>> => {
   return new Promise((resolve) => {
     child_process.exec(
-      `yt-dlp -O title -O channel -O thumbnail ${url}`,
+      `yt-dlp --dump-single-json --no-warnings ${url}`,
       (error, stdout) => {
         if (error) {
           resolve({});
           return;
         }
-        const lines = stdout.split("\n");
+        const data = JSON.parse(stdout);
         resolve({
-          title: lines[0],
-          channel: lines[1],
-          thumbnail: lines[2],
+          title: data.title || undefined,
+          description: data.description || undefined,
+          channel: data.channel || undefined,
+          channelUrl: data.channel_url || undefined,
+          thumbnail: data.thumbnail || undefined,
+          duration: data.duration || undefined,
+          viewCount: data.view_count || undefined,
+          timestamp: data.timestamp || undefined,
         });
       },
     );
