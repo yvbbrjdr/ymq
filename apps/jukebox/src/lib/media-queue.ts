@@ -5,6 +5,7 @@ import { MPVClient } from "./mpv-client";
 
 export interface MediaItem {
   title: string;
+  channel: string;
   thumbnail: string;
   url: string;
   addedAt: Date;
@@ -54,6 +55,7 @@ export class MediaQueue extends EventEmitter {
     const metadata = await getMediaMetadata(url);
     queue.queue.push({
       title: metadata.title,
+      channel: metadata.channel,
       thumbnail: metadata.thumbnail,
       url,
       addedAt: new Date(),

@@ -1,26 +1,31 @@
-import { YtDlp } from "ytdlp-nodejs";
+import child_process from "child_process";
 
 export interface MediaMetadata {
   title: string;
+  channel: string;
   thumbnail: string;
 }
 
 export const getMediaMetadata = async (url: string): Promise<MediaMetadata> => {
-  const ytdlp = new YtDlp();
-
-  try {
-    const info = await ytdlp.getInfoAsync<"video">(url);
-
-    return {
-      title: info.title || "Unknown",
-      thumbnail: info.thumbnail || "",
-    };
-  } catch (error) {
-    console.error(`Failed to fetch media metadata for ${url}:`, error);
-
-    return {
-      title: "Unknown",
-      thumbnail: "",
-    };
-  }
+  return new Promise((resolve) => {
+    child_process.exec(
+      `yt-dlp -O title -O channel -O thumbnail ${url}`,
+      (error, stdout) => {
+        if (error) {
+          resolve({
+            title: "Unknown",
+            channel: "Unknown",
+            thumbnail: "",
+          });
+          return;
+        }
+        const lines = stdout.split("\n");
+        resolve({
+          title: lines[0],
+          channel: lines[1],
+          thumbnail: lines[2],
+        });
+      },
+    );
+  });
 };
