@@ -2,8 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { LogOut, Radio, User } from "lucide-react";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group";
+import { ClipboardPaste, LogOut, Plus, Radio, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -50,6 +55,15 @@ export default function Home() {
     wsClient.start();
     return () => wsClient.destroy();
   }, [wsClient]);
+
+  const handleAddToQueue = () => {
+    const trimmedQuery = query.trim();
+    if (trimmedQuery === "") {
+      return;
+    }
+    wsClient.enqueue(username, trimmedQuery);
+    setQuery("");
+  };
 
   return (
     <div className="container mx-auto px-10 my-10 flex flex-col gap-8">
@@ -103,17 +117,33 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <div className="flex gap-2">
-                <Input
-                  type="text"
-                  placeholder="URL or search query"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                />
-                <Button
-                  onClick={() => {
-                    wsClient.enqueue(username, query);
-                  }}
-                >
+                <InputGroup>
+                  <InputGroupInput
+                    type="text"
+                    placeholder="URL or search query"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleAddToQueue();
+                      }
+                    }}
+                  />
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupButton
+                      size="icon-xs"
+                      onClick={() => {
+                        navigator.clipboard.readText().then((text) => {
+                          setQuery(text);
+                        });
+                      }}
+                    >
+                      <ClipboardPaste />
+                    </InputGroupButton>
+                  </InputGroupAddon>
+                </InputGroup>
+                <Button onClick={handleAddToQueue}>
+                  <Plus />
                   Add
                 </Button>
               </div>
