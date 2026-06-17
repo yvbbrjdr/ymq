@@ -6,11 +6,23 @@
   "scripts": {
     "lint": "eslint .",
     "format": "prettier --write .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "dev:mpv-server": "cd apps/mpv-server && pnpm dev",
+    "dev:jukebox": "cd apps/jukebox && pnpm dev",
+    "dev": "concurrently \"pnpm dev:mpv-server\" \"pnpm dev:jukebox\"",
+    "build:mpv-server": "cd apps/mpv-server && pnpm build",
+    "build:jukebox": "cd apps/jukebox && pnpm build",
+    "build": "pnpm build:mpv-server && pnpm build:jukebox",
+    "start:mpv-server": "cd apps/mpv-server && pnpm start",
+    "start:jukebox": "cd apps/jukebox && pnpm start",
+    "start": "concurrently \"pnpm start:mpv-server\" \"pnpm start:jukebox\""
   },
   "keywords": [],
   "author": "yvbbrjdr",
   "license": "BSD-3-Clause",
+  "dependencies": {
+    "concurrently": "^10.0.3"
+  },
   "devDependencies": {
     "@commitlint/cli": "^21.0.2",
     "@commitlint/config-conventional": "^21.0.2",
