@@ -52,12 +52,12 @@ export class MediaQueue extends EventEmitter {
   }
 
   async enqueue(username: string, url: string) {
+    const metadata = await getMediaMetadata(url);
     let queue = this.status.queues.find((q) => q.username === username);
     if (!queue) {
       queue = { username, queue: [] };
       this.status.queues.push(queue);
     }
-    const metadata = await getMediaMetadata(url);
     queue.queue.push({
       ...metadata,
       url,
