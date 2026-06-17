@@ -39,10 +39,10 @@ export class WsClient extends EventTarget {
     this.ws.send(JSON.stringify(message));
   }
 
-  enqueue(username: string, url: string) {
+  enqueue(username: string, query: string) {
     this.sendMessage({
       type: "media-queue/enqueue",
-      data: { username, url },
+      data: { username, query },
     });
   }
 

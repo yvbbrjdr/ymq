@@ -2,15 +2,36 @@ import child_process from "child_process";
 
 import { MediaItem } from "./media-queue";
 
+const getUrlFromQuery = (query: string): Promise<string> => {
+  try {
+    new URL(query);
+    return Promise.resolve(query);
+  } catch {
+    return new Promise((resolve, reject) => {
+      child_process.exec(
+        `yt-dlp -O original_url "ytsearch:${query}"`,
+        (error, stdout) => {
+          if (error) {
+            reject(error);
+            return;
+          }
+          resolve(stdout.trim());
+        },
+      );
+    });
+  }
+};
+
 export const getMediaMetadata = async (
-  url: string,
-): Promise<Partial<MediaItem>> => {
-  return new Promise((resolve) => {
+  query: string,
+): Promise<Partial<MediaItem> & { url: string }> => {
+  const url = await getUrlFromQuery(query);
+  return new Promise((resolve, reject) => {
     child_process.exec(
       `yt-dlp --dump-single-json --no-warnings ${url}`,
       (error, stdout) => {
         if (error) {
-          resolve({});
+          reject(error);
           return;
         }
         const data = JSON.parse(stdout);
@@ -23,6 +44,7 @@ export const getMediaMetadata = async (
           duration: data.duration || undefined,
           viewCount: data.view_count || undefined,
           timestamp: data.timestamp || undefined,
+          url,
         });
       },
     );

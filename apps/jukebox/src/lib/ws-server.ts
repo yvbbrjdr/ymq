@@ -58,7 +58,10 @@ class WsConnection {
 
     switch (parsedMessage.type) {
       case "media-queue/enqueue":
-        mediaQueue.enqueue(parsedMessage.data.username, parsedMessage.data.url);
+        mediaQueue.enqueue(
+          parsedMessage.data.username,
+          parsedMessage.data.query,
+        );
         break;
       case "media-queue/remove":
         mediaQueue.remove(

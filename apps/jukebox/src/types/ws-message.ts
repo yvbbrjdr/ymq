@@ -5,7 +5,7 @@ export interface WsMediaQueueEnqueueMessage {
   type: "media-queue/enqueue";
   data: {
     username: string;
-    url: string;
+    query: string;
   };
 }
 

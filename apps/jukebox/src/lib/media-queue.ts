@@ -51,8 +51,8 @@ export class MediaQueue extends EventEmitter {
     });
   }
 
-  async enqueue(username: string, url: string) {
-    const metadata = await getMediaMetadata(url);
+  async enqueue(username: string, query: string) {
+    const metadata = await getMediaMetadata(query);
     let queue = this.status.queues.find((q) => q.username === username);
     if (!queue) {
       queue = { username, queue: [] };
@@ -60,7 +60,6 @@ export class MediaQueue extends EventEmitter {
     }
     queue.queue.push({
       ...metadata,
-      url,
       addedAt: new Date(),
       addedBy: username,
     });
