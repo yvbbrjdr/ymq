@@ -27,7 +27,12 @@ export class MPV extends EventEmitter {
     );
     this.mpvProcess = child_process.spawn(
       this.binaryPath,
-      ["--idle=yes", "--input-ipc-server=" + this.socketPath],
+      [
+        "--idle=yes",
+        "--input-ipc-server=" + this.socketPath,
+        "--force-window=yes",
+        "--fullscreen",
+      ],
       {
         stdio: ["ignore", "ignore", "pipe"],
       },

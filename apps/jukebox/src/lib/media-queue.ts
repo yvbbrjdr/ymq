@@ -86,7 +86,6 @@ export class MediaQueue extends EventEmitter {
       }
       await mpv.loadfile(this.status.queues[0].queue[0].url);
       await mpv.play();
-      await mpv.setFullscreen(true);
       const queue = this.status.queues.shift()!;
       this.status.nowPlaying = queue.queue.shift()!;
       if (queue.queue.length > 0) {
