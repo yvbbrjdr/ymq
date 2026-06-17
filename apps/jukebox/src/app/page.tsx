@@ -8,7 +8,9 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { ClipboardPaste, LogOut, Plus, Radio, User } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { ClipboardPaste, LogOut, Plus, Radio, Tv, User } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -97,7 +99,57 @@ export default function Home() {
       </Card>
       <div className="grid grid-cols-3 gap-8">
         <div className="col-span-2">
-          <Card>
+          <Card className="px-6 py-6">
+            <div className="flex flex-col gap-4">
+              <div className="w-full aspect-video rounded-xl overflow-hidden border border-gray-500">
+                {mediaQueueStatus.nowPlaying ? (
+                  <Link href={mediaQueueStatus.nowPlaying.url} target="_blank">
+                    <img
+                      src={mediaQueueStatus.nowPlaying.thumbnail}
+                      className="w-full h-full object-cover"
+                    />
+                  </Link>
+                ) : (
+                  <div className="w-full h-full flex flex-col gap-2 items-center justify-center">
+                    <Tv className="text-gray-400 size-10" />
+                    <p className="text-gray-400">No media playing</p>
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-col gap-1">
+                {mediaQueueStatus.nowPlaying?.title ? (
+                  <Link href={mediaQueueStatus.nowPlaying.url} target="_blank">
+                    <h2 className="text-2xl font-bold">
+                      {mediaQueueStatus.nowPlaying.title}
+                    </h2>
+                  </Link>
+                ) : (
+                  <h2 className="text-2xl font-bold">No media playing</h2>
+                )}
+                {mediaQueueStatus.nowPlaying?.channel ? (
+                  <Link
+                    href={mediaQueueStatus.nowPlaying?.channelUrl ?? ""}
+                    target="_blank"
+                  >
+                    <p className="text-md text-gray-400">
+                      {mediaQueueStatus.nowPlaying.channel}
+                    </p>
+                  </Link>
+                ) : (
+                  <p className="text-md text-gray-400">No channel</p>
+                )}
+              </div>
+              <div>
+                <Slider
+                  min={0}
+                  max={playerStatus.duration}
+                  value={[playerStatus.position]}
+                  onValueChange={(value) => {
+                    wsClient.seek(value[0]);
+                  }}
+                />
+              </div>
+            </div>
             <CardHeader>
               <h2 className="text-lg font-semibold">Now Playing</h2>
             </CardHeader>
