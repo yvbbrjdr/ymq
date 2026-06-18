@@ -217,6 +217,7 @@ export default function Home() {
                     </p>
                   </div>
                   <Slider
+                    className="[&_[data-slot=slider-track]]:h-1 [&_[data-slot=slider-thumb]]:size-3"
                     min={0}
                     max={playerStatus.duration}
                     value={[playerPosition]}
@@ -278,6 +279,7 @@ export default function Home() {
                       )}
                     </Button>
                     <Slider
+                      className="[&_[data-slot=slider-track]]:h-1 [&_[data-slot=slider-thumb]]:size-3"
                       min={0}
                       max={100}
                       value={[playerStatus.volume]}
