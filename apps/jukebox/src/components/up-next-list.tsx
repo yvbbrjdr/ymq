@@ -3,6 +3,7 @@ import { Trash } from "lucide-react";
 import Link from "next/link";
 
 import { MediaItem, MediaQueuePerUser } from "../lib/media-queue";
+import { formatNumber, formatTime } from "../lib/utils";
 
 export interface UpNextListItemProps {
   curUsername: string;
@@ -18,17 +19,24 @@ export function UpNextListItem({
   onRemove,
 }: UpNextListItemProps) {
   return (
-    <div className="flex gap-2 w-full">
+    <div className="flex gap-2 w-full items-center">
       <div className="w-1/3 min-w-1/3 aspect-video rounded-lg overflow-hidden">
         <Link href={item.url} target="_blank">
-          <img
-            src={item.thumbnail}
-            className="w-full h-full object-cover"
-            title={item.description}
-          />
+          <div className="relative w-full h-full">
+            <img
+              src={item.thumbnail}
+              className="absolute inset-0 w-full h-full object-cover"
+              title={item.description}
+            />
+            <div className="absolute bottom-0 right-0 px-1 mr-1 mb-1 rounded-sm bg-black/50 flex items-center justify-center">
+              <p className="text-white text-xs">
+                {formatTime(item.duration ?? 0)}
+              </p>
+            </div>
+          </div>
         </Link>
       </div>
-      <div className="flex flex-col gap-1 w-full">
+      <div className="flex flex-col w-full">
         <Link href={item.url} target="_blank" className="w-fit">
           <h3 className="text-md font-medium line-clamp-1" title={item.title}>
             {item.title}
@@ -42,6 +50,10 @@ export function UpNextListItem({
             {item.channel}
           </p>
         </Link>
+        <p className="text-sm text-gray-400">
+          {formatNumber(item.viewCount ?? 0)} views •{" "}
+          {new Date((item.timestamp ?? 0) * 1000).toLocaleDateString()}
+        </p>
       </div>
       {item.addedBy === curUsername && (
         <Button
