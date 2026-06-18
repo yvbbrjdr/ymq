@@ -4,12 +4,16 @@ import { MediaItem } from "./media-queue";
 
 const getUrlFromQuery = (query: string): Promise<string> => {
   try {
-    new URL(query);
+    const url = new URL(query);
+    if (!["http:", "https:"].includes(url.protocol)) {
+      throw new Error("Only http(s) URLs are supported");
+    }
     return Promise.resolve(query);
   } catch {
     return new Promise((resolve, reject) => {
-      child_process.exec(
-        `yt-dlp -O original_url "ytsearch:${query}"`,
+      child_process.execFile(
+        "yt-dlp",
+        ["-O", "original_url", `ytsearch:${query}`],
         (error, stdout) => {
           if (error) {
             reject(error);
@@ -27,8 +31,9 @@ export const getMediaMetadata = async (
 ): Promise<Partial<MediaItem> & { url: string }> => {
   const url = await getUrlFromQuery(query);
   return new Promise((resolve, reject) => {
-    child_process.exec(
-      `yt-dlp --dump-single-json --no-warnings ${url}`,
+    child_process.execFile(
+      "yt-dlp",
+      ["--dump-single-json", "--no-warnings", url],
       (error, stdout) => {
         if (error) {
           reject(error);
