@@ -117,7 +117,7 @@ export default function Home() {
       </Card>
       <div className="grid grid-cols-3 gap-8">
         <div className="col-span-2">
-          <Card className="relative px-6 py-6">
+          <Card className="relative px-6 pt-6 pb-2">
             {mediaQueueStatus.nowPlaying?.thumbnail && (
               <>
                 <div
@@ -136,6 +136,7 @@ export default function Home() {
                     <img
                       src={mediaQueueStatus.nowPlaying.thumbnail}
                       className="w-full h-full object-cover"
+                      title={mediaQueueStatus.nowPlaying.description}
                     />
                   </Link>
                 ) : (
@@ -145,27 +146,64 @@ export default function Home() {
                   </div>
                 )}
               </div>
-              <div className="flex flex-col gap-1">
-                {mediaQueueStatus.nowPlaying?.title ? (
-                  <Link href={mediaQueueStatus.nowPlaying.url} target="_blank">
-                    <h2 className="text-2xl font-bold">
-                      {mediaQueueStatus.nowPlaying.title}
-                    </h2>
-                  </Link>
+              <div className="flex flex-col">
+                <div className="flex flex-col gap-1">
+                  {mediaQueueStatus.nowPlaying ? (
+                    <Link
+                      href={mediaQueueStatus.nowPlaying.url}
+                      target="_blank"
+                      className="w-fit"
+                    >
+                      <h2 className="text-2xl font-bold">
+                        {mediaQueueStatus.nowPlaying.title ?? "Untitled"}
+                      </h2>
+                    </Link>
+                  ) : (
+                    <h2 className="text-2xl font-bold">No media playing</h2>
+                  )}
+                  <div className="flex items-center gap-1">
+                    {mediaQueueStatus.nowPlaying ? (
+                      <>
+                        <Link
+                          href={mediaQueueStatus.nowPlaying?.channelUrl ?? ""}
+                          target="_blank"
+                          className="w-fit"
+                        >
+                          <p className="text-md text-gray-400">
+                            {mediaQueueStatus.nowPlaying.channel ??
+                              "No channel"}
+                          </p>
+                        </Link>
+                        {mediaQueueStatus.nowPlaying.viewCount && (
+                          <p className="text-md text-gray-400">
+                            •{" "}
+                            {mediaQueueStatus.nowPlaying.viewCount.toLocaleString()}{" "}
+                            views
+                          </p>
+                        )}
+                        {mediaQueueStatus.nowPlaying.timestamp && (
+                          <p className="text-md text-gray-400">
+                            • Uploaded on{" "}
+                            {new Date(
+                              mediaQueueStatus.nowPlaying.timestamp * 1000,
+                            ).toLocaleString()}
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      <p className="text-md text-gray-400">No media playing</p>
+                    )}
+                  </div>
+                </div>
+                {mediaQueueStatus.nowPlaying ? (
+                  <p className="text-md text-gray-400">
+                    Added by {mediaQueueStatus.nowPlaying.addedBy} on{" "}
+                    {new Date(
+                      mediaQueueStatus.nowPlaying.addedAt,
+                    ).toLocaleString()}
+                  </p>
                 ) : (
-                  <h2 className="text-2xl font-bold">No media playing</h2>
-                )}
-                {mediaQueueStatus.nowPlaying?.channel ? (
-                  <Link
-                    href={mediaQueueStatus.nowPlaying?.channelUrl ?? ""}
-                    target="_blank"
-                  >
-                    <p className="text-md text-gray-400">
-                      {mediaQueueStatus.nowPlaying.channel}
-                    </p>
-                  </Link>
-                ) : (
-                  <p className="text-md text-gray-400">No channel</p>
+                  <p className="text-md text-gray-400">No media playing</p>
                 )}
               </div>
               <div className="flex flex-col items-center gap-2">
@@ -217,7 +255,7 @@ export default function Home() {
                     <Button
                       variant="ghost"
                       className="size-12"
-                      disabled={playerStatus.idle}
+                      disabled={mediaQueueStatus.nowPlaying === null}
                       onClick={() => {
                         wsClient.playNext();
                       }}
@@ -250,7 +288,6 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <pre>{JSON.stringify(mediaQueueStatus.nowPlaying, null, 2)}</pre>
             </div>
           </Card>
         </div>
