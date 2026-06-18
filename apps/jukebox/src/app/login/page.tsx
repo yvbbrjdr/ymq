@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 
-import LoginClient from "./LoginClient";
+import LoginClient from "./login-client";
 
 export const metadata: Metadata = {
   title: "Login | YMQ Jukebox",
