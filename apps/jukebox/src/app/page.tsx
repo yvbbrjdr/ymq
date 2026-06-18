@@ -117,8 +117,19 @@ export default function Home() {
       </Card>
       <div className="grid grid-cols-3 gap-8">
         <div className="col-span-2">
-          <Card className="px-6 py-6">
-            <div className="flex flex-col gap-4">
+          <Card className="relative px-6 py-6">
+            {mediaQueueStatus.nowPlaying?.thumbnail && (
+              <>
+                <div
+                  className="absolute inset-0 scale-110 bg-cover bg-center opacity-40 blur-2xl"
+                  style={{
+                    backgroundImage: `url(${mediaQueueStatus.nowPlaying?.thumbnail})`,
+                  }}
+                />
+                <div className="absolute inset-0 bg-card/70" />
+              </>
+            )}
+            <div className="relative z-10 flex flex-col gap-4">
               <div className="w-full aspect-video rounded-xl overflow-hidden border border-gray-500">
                 {mediaQueueStatus.nowPlaying ? (
                   <Link href={mediaQueueStatus.nowPlaying.url} target="_blank">
