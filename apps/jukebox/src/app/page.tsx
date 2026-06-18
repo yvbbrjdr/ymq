@@ -9,13 +9,26 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Slider } from "@/components/ui/slider";
-import { ClipboardPaste, LogOut, Plus, Radio, Tv, User } from "lucide-react";
+import {
+  ClipboardPaste,
+  LogOut,
+  Pause,
+  Play,
+  Plus,
+  Radio,
+  SkipForward,
+  Tv,
+  User,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { MediaQueueStatus } from "../lib/media-queue";
 import { MPVStatus } from "../lib/mpv-client";
+import { formatTime } from "../lib/utils";
 import { WsClient } from "../lib/ws-client";
 
 export default function Home() {
@@ -35,6 +48,8 @@ export default function Home() {
     nowPlaying: null,
     queues: [],
   });
+  const [playerPosition, setPlayerPosition] = useState<number>(0);
+  const positionDragging = useRef<boolean>(false);
 
   useEffect(() => {
     const savedUsername = localStorage.getItem("username");
@@ -49,6 +64,9 @@ export default function Home() {
     wsClient.addEventListener("player/status", (event) => {
       const status = (event as CustomEvent<MPVStatus>).detail;
       setPlayerStatus(status);
+      if (!positionDragging.current) {
+        setPlayerPosition(status.position);
+      }
     });
     wsClient.addEventListener("media-queue/status", (event) => {
       const status = (event as CustomEvent<MediaQueueStatus>).detail;
@@ -139,24 +157,90 @@ export default function Home() {
                   <p className="text-md text-gray-400">No channel</p>
                 )}
               </div>
-              <div>
-                <Slider
-                  min={0}
-                  max={playerStatus.duration}
-                  value={[playerStatus.position]}
-                  onValueChange={(value) => {
-                    wsClient.seek(value[0]);
-                  }}
-                />
+              <div className="flex flex-col items-center gap-2">
+                <div className="flex flex-col items-center gap-1 w-full">
+                  <div className="flex justify-between w-full">
+                    <p className="text-md text-gray-400">
+                      {formatTime(playerPosition)}
+                    </p>
+                    <p className="text-md text-gray-400">
+                      {formatTime(playerStatus.duration)}
+                    </p>
+                  </div>
+                  <Slider
+                    min={0}
+                    max={playerStatus.duration}
+                    value={[playerPosition]}
+                    onValueChange={(value) => {
+                      setPlayerPosition(value[0]);
+                      wsClient.seek(value[0]);
+                      positionDragging.current = false;
+                    }}
+                    onPointerDown={() => {
+                      positionDragging.current = true;
+                    }}
+                  />
+                </div>
+                <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center">
+                  <div />
+                  <div className="flex items-center justify-center">
+                    <Button variant="ghost" className="size-12 invisible" />
+                    <Button
+                      variant="ghost"
+                      className="size-16"
+                      disabled={playerStatus.idle}
+                      onClick={() => {
+                        if (playerStatus.pause) {
+                          wsClient.play();
+                        } else {
+                          wsClient.pause();
+                        }
+                      }}
+                    >
+                      {playerStatus.pause || playerStatus.idle ? (
+                        <Play className="size-8" />
+                      ) : (
+                        <Pause className="size-8" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="size-12"
+                      disabled={playerStatus.idle}
+                      onClick={() => {
+                        wsClient.playNext();
+                      }}
+                    >
+                      <SkipForward className="size-6" />
+                    </Button>
+                  </div>
+                  <div className="flex w-40 justify-self-end gap-1">
+                    <Button
+                      variant="ghost"
+                      className="size-10"
+                      onClick={() => {
+                        wsClient.setMuted(!playerStatus.muted);
+                      }}
+                    >
+                      {playerStatus.muted ? (
+                        <VolumeX className="size-5" />
+                      ) : (
+                        <Volume2 className="size-5" />
+                      )}
+                    </Button>
+                    <Slider
+                      min={0}
+                      max={100}
+                      value={[playerStatus.volume]}
+                      onValueChange={(value) => {
+                        wsClient.setVolume(value[0]);
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-            <CardHeader>
-              <h2 className="text-lg font-semibold">Now Playing</h2>
-            </CardHeader>
-            <CardContent>
-              <pre>{JSON.stringify(playerStatus, null, 2)}</pre>
               <pre>{JSON.stringify(mediaQueueStatus.nowPlaying, null, 2)}</pre>
-            </CardContent>
+            </div>
           </Card>
         </div>
         <div className="col-span-1 flex flex-col gap-8">
