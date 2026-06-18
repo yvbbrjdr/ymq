@@ -9,8 +9,10 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Slider } from "@/components/ui/slider";
+import { UpNextList } from "@/components/up-next-list";
 import {
   ClipboardPaste,
+  ListMusic,
   LogOut,
   Pause,
   Play,
@@ -140,7 +142,7 @@ export default function Home() {
                     />
                   </Link>
                 ) : (
-                  <div className="w-full h-full flex flex-col gap-2 items-center justify-center">
+                  <div className="w-full h-full flex flex-col gap-2 items-center justify-center bg-gray-500/10">
                     <Tv className="text-gray-400 size-10" />
                     <p className="text-gray-400">No media playing</p>
                   </div>
@@ -183,10 +185,10 @@ export default function Home() {
                         )}
                         {mediaQueueStatus.nowPlaying.timestamp && (
                           <p className="text-md text-gray-400">
-                            • Uploaded on{" "}
+                            •{" "}
                             {new Date(
                               mediaQueueStatus.nowPlaying.timestamp * 1000,
-                            ).toLocaleString()}
+                            ).toLocaleDateString()}
                           </p>
                         )}
                       </>
@@ -195,16 +197,6 @@ export default function Home() {
                     )}
                   </div>
                 </div>
-                {mediaQueueStatus.nowPlaying ? (
-                  <p className="text-md text-gray-400">
-                    Added by {mediaQueueStatus.nowPlaying.addedBy} on{" "}
-                    {new Date(
-                      mediaQueueStatus.nowPlaying.addedAt,
-                    ).toLocaleString()}
-                  </p>
-                ) : (
-                  <p className="text-md text-gray-400">No media playing</p>
-                )}
               </div>
               <div className="flex flex-col items-center gap-2">
                 <div className="flex flex-col items-center gap-1 w-full">
@@ -340,7 +332,20 @@ export default function Home() {
               <h2 className="text-lg font-semibold">Up Next</h2>
             </CardHeader>
             <CardContent>
-              <pre>{JSON.stringify(mediaQueueStatus.queues, null, 2)}</pre>
+              {mediaQueueStatus.queues.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-6 gap-1 rounded-xl border border-gray-500 bg-gray-500/10">
+                  <ListMusic className="size-8 text-gray-400" />
+                  <p className="text-md text-gray-400">The queue is empty</p>
+                </div>
+              ) : (
+                <UpNextList
+                  curUsername={username}
+                  queues={mediaQueueStatus.queues}
+                  onRemove={(username, index) =>
+                    wsClient.remove(username, index)
+                  }
+                />
+              )}
             </CardContent>
           </Card>
         </div>
