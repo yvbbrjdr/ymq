@@ -25,7 +25,10 @@ export default function LoginClient() {
 
   return (
     <div className="h-screen flex">
-      <form onSubmit={handleSubmit} className="w-full max-w-sm mx-auto my-auto">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-sm mx-auto my-auto px-4"
+      >
         <Card>
           <CardHeader>
             <CardTitle>Login to YMQ Jukebox</CardTitle>

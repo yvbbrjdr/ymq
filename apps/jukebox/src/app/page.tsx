@@ -88,15 +88,15 @@ export default function Home() {
   };
 
   return (
-    <div className="container mx-auto px-10 my-10 flex flex-col gap-8">
+    <div className="container mx-auto px-4 my-4 lg:my-10 flex flex-col gap-4 lg:gap-8">
       <Card className="px-6 py-4">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-0 justify-between items-center">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <Radio className="text-primary" />
               <p className="text-md text-gray-400">YMQ Jukebox</p>
             </div>
-            <h1 className="text-5xl font-bold">Drop the beat!</h1>
+            <h1 className="text-3xl lg:text-5xl font-bold">Drop the beat!</h1>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" className="cursor-default">
@@ -117,7 +117,7 @@ export default function Home() {
           </div>
         </div>
       </Card>
-      <div className="grid grid-cols-3 gap-8">
+      <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 lg:gap-8">
         <div className="col-span-2">
           <Card className="relative px-6 pt-6 pb-2">
             {mediaQueueStatus.nowPlaying?.thumbnail && (
@@ -285,7 +285,7 @@ export default function Home() {
             </div>
           </Card>
         </div>
-        <div className="col-span-1 flex flex-col gap-8">
+        <div className="col-span-1 flex flex-col gap-4 lg:gap-8">
           <Card>
             <CardHeader>
               <h2 className="text-lg font-semibold">Add to Queue</h2>
