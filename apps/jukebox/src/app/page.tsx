@@ -27,6 +27,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 import { MediaQueueStatus } from "../lib/media-queue";
 import { MPVStatus } from "../lib/mpv-client";
@@ -51,6 +52,7 @@ export default function Home() {
     queues: [],
   });
   const [playerPosition, setPlayerPosition] = useState<number>(0);
+  const [numPendingEnqueue, setNumPendingEnqueue] = useState<number>(0);
   const positionDragging = useRef<boolean>(false);
 
   useEffect(() => {
@@ -84,7 +86,17 @@ export default function Home() {
       return;
     }
     setQuery("");
-    await wsClient.enqueue(username, trimmedQuery);
+    setNumPendingEnqueue((num) => num + 1);
+    try {
+      await wsClient.enqueue(username, trimmedQuery);
+    } catch (error) {
+      toast.error(`Failed to add to queue: ${trimmedQuery}`, {
+        description: error as string,
+        duration: 10000,
+      });
+    } finally {
+      setNumPendingEnqueue((num) => num - 1);
+    }
   };
 
   return (
@@ -288,7 +300,12 @@ export default function Home() {
         <div className="col-span-1 flex flex-col gap-4 lg:gap-8">
           <Card>
             <CardHeader>
-              <h2 className="text-lg font-semibold">Add to Queue</h2>
+              <h2 className="text-lg font-semibold">
+                Add to Queue
+                {numPendingEnqueue > 0
+                  ? ` (${numPendingEnqueue} Pending)`
+                  : null}
+              </h2>
               <p className="text-sm text-gray-400">
                 Paste a URL or enter a search query to add it to the queue
               </p>
