@@ -67,20 +67,34 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    wsClient.addEventListener("player/status", (event) => {
-      const status = (event as CustomEvent<MPVStatus>).detail;
-      setPlayerStatus(status);
-      if (!positionDragging.current) {
-        setPlayerPosition(status.position);
-      }
-    });
-    wsClient.addEventListener("media-queue/status", (event) => {
-      const status = (event as CustomEvent<MediaQueueStatus>).detail;
-      setMediaQueueStatus(status);
-    });
+    wsClient.addEventListener("player/status", handlePlayerStatusChange);
+    wsClient.addEventListener(
+      "media-queue/status",
+      handleMediaQueueStatusChange,
+    );
     wsClient.start();
-    return () => wsClient.destroy();
+    return () => {
+      wsClient.destroy();
+      wsClient.removeEventListener(
+        "media-queue/status",
+        handleMediaQueueStatusChange,
+      );
+      wsClient.removeEventListener("player/status", handlePlayerStatusChange);
+    };
   }, [wsClient]);
+
+  const handlePlayerStatusChange = (event: Event) => {
+    const status = (event as CustomEvent<MPVStatus>).detail;
+    setPlayerStatus(status);
+    if (!positionDragging.current) {
+      setPlayerPosition(status.position);
+    }
+  };
+
+  const handleMediaQueueStatusChange = (event: Event) => {
+    const status = (event as CustomEvent<MediaQueueStatus>).detail;
+    setMediaQueueStatus(status);
+  };
 
   const handleAddToQueue = async () => {
     const trimmedQuery = query.trim();
@@ -230,6 +244,8 @@ export default function Home() {
                     onValueChange={(value) => {
                       setPlayerPosition(value[0]);
                       wsClient.seek(value[0]);
+                    }}
+                    onValueCommit={() => {
                       positionDragging.current = false;
                     }}
                     onPointerDown={() => {
