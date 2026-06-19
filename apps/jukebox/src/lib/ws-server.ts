@@ -24,21 +24,17 @@ class WsConnection {
     const mediaQueue = MediaQueue.getInstance();
     const mpv = MPVClient.getInstance();
 
-    this.sendMessage(
-      JSON.stringify({
-        type: "media-queue/status",
-        data: mediaQueue.status,
-      }),
-    );
-    this.sendMessage(
-      JSON.stringify({
-        type: "player/status",
-        data: mpv.status,
-      }),
-    );
+    this.sendMessage({
+      type: "media-queue/status",
+      data: mediaQueue.status,
+    });
+    this.sendMessage({
+      type: "player/status",
+      data: mpv.status,
+    });
   }
 
-  private messageReceived(message: string) {
+  private async messageReceived(message: string) {
     console.log(
       `Received message from ${this.getRemoteAddrPort()}: ${message}`,
     );
@@ -56,42 +52,62 @@ class WsConnection {
       return;
     }
 
-    switch (parsedMessage.type) {
-      case "media-queue/enqueue":
-        mediaQueue.enqueue(
-          parsedMessage.data.username,
-          parsedMessage.data.query,
-        );
-        break;
-      case "media-queue/remove":
-        mediaQueue.remove(
-          parsedMessage.data.username,
-          parsedMessage.data.index,
-        );
-        break;
-      case "media-queue/play-next":
-        mediaQueue.playNext();
-        break;
-      case "player/pause":
-        mpv.pause();
-        break;
-      case "player/play":
-        mpv.play();
-        break;
-      case "player/seek":
-        mpv.seek(parsedMessage.data.position);
-        break;
-      case "player/set-volume":
-        mpv.setVolume(parsedMessage.data.volume);
-        break;
-      case "player/set-muted":
-        mpv.setMuted(parsedMessage.data.muted);
-        break;
+    try {
+      switch (parsedMessage.type) {
+        case "media-queue/enqueue":
+          await mediaQueue.enqueue(
+            parsedMessage.data.username,
+            parsedMessage.data.query,
+          );
+          break;
+        case "media-queue/remove":
+          mediaQueue.remove(
+            parsedMessage.data.username,
+            parsedMessage.data.index,
+          );
+          break;
+        case "media-queue/play-next":
+          await mediaQueue.playNext();
+          break;
+        case "player/pause":
+          await mpv.pause();
+          break;
+        case "player/play":
+          await mpv.play();
+          break;
+        case "player/seek":
+          await mpv.seek(parsedMessage.data.position);
+          break;
+        case "player/set-volume":
+          await mpv.setVolume(parsedMessage.data.volume);
+          break;
+        case "player/set-muted":
+          await mpv.setMuted(parsedMessage.data.muted);
+          break;
+      }
+    } catch (error: unknown) {
+      console.error(
+        `Error processing message from ${this.getRemoteAddrPort()}: ${error}`,
+      );
+      this.sendMessage({
+        type: "response",
+        id: parsedMessage.id,
+        data: {
+          ok: false,
+          error: error instanceof Error ? error.message : "Unknown error",
+        },
+      });
+      return;
     }
+    this.sendMessage({
+      type: "response",
+      id: parsedMessage.id,
+      data: { ok: true, error: "success" },
+    });
   }
 
-  sendMessage(message: string) {
-    this.ws.send(message);
+  sendMessage(message: WsMessage) {
+    this.ws.send(JSON.stringify(message));
   }
 
   getRemoteAddrPort() {
@@ -143,20 +159,16 @@ export class WsServer {
     const mpv = MPVClient.getInstance();
 
     mediaQueue.on("status", (status) => {
-      this.broadcastMessage(
-        JSON.stringify({
-          type: "media-queue/status",
-          data: status,
-        }),
-      );
+      this.broadcastMessage({
+        type: "media-queue/status",
+        data: status,
+      });
     });
     mpv.on("status", (status) => {
-      this.broadcastMessage(
-        JSON.stringify({
-          type: "player/status",
-          data: status,
-        }),
-      );
+      this.broadcastMessage({
+        type: "player/status",
+        data: status,
+      });
     });
   }
 
@@ -170,7 +182,7 @@ export class WsServer {
     });
   }
 
-  private broadcastMessage(message: string) {
+  private broadcastMessage(message: WsMessage) {
     this.connections.forEach((connection) => connection.sendMessage(message));
   }
 

@@ -78,13 +78,13 @@ export default function Home() {
     return () => wsClient.destroy();
   }, [wsClient]);
 
-  const handleAddToQueue = () => {
+  const handleAddToQueue = async () => {
     const trimmedQuery = query.trim();
     if (trimmedQuery === "") {
       return;
     }
-    wsClient.enqueue(username, trimmedQuery);
     setQuery("");
+    await wsClient.enqueue(username, trimmedQuery);
   };
 
   return (
