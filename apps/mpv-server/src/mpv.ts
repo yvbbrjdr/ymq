@@ -15,7 +15,7 @@ export class MPV extends EventEmitter {
 
   constructor() {
     super();
-    this.binaryPath = process.env.MPV_BINARY_PATH || "/usr/bin/mpv";
+    this.binaryPath = process.env.MPV_BINARY_PATH || "mpv";
     this.socketPath = process.env.MPV_SOCKET_PATH || "/tmp/mpv.sock";
     this.mpvProcess = null;
     this.ipcClient = null;

@@ -46,7 +46,7 @@ const main = async () => {
     "/ws",
     upgradeWebSocket((c) => {
       const auth = c.req.header("Authorization");
-      if (auth !== `Bearer ${process.env.API_KEY}`) {
+      if (auth !== `Bearer ${process.env.API_KEY || "your-api-key-here"}`) {
         console.warn(
           `Unauthorized WebSocket connection attempt from ${getRemoteAddrPort(c)} with Authorization header: ${auth}`,
         );
@@ -83,8 +83,8 @@ const main = async () => {
   serve(
     {
       fetch: app.fetch,
-      port: parseInt(process.env.PORT || "3000"),
-      hostname: process.env.HOST,
+      port: parseInt(process.env.PORT || "8678"),
+      hostname: process.env.HOST || "::1",
       websocket: { server: wss },
     },
     (info) => {

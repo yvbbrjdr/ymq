@@ -2,6 +2,10 @@ import child_process from "child_process";
 
 import { MediaItem } from "./media-queue";
 
+const getYtDlpBinaryPath = () => {
+  return process.env.YT_DLP_BINARY_PATH || "yt-dlp";
+};
+
 const getUrlFromQuery = (query: string): Promise<string> => {
   try {
     const url = new URL(query);
@@ -12,7 +16,7 @@ const getUrlFromQuery = (query: string): Promise<string> => {
   } catch {
     return new Promise((resolve, reject) => {
       child_process.execFile(
-        "yt-dlp",
+        getYtDlpBinaryPath(),
         ["-O", "original_url", `ytsearch:${query}`],
         (error, stdout) => {
           if (error) {
@@ -32,7 +36,7 @@ export const getMediaMetadata = async (
   const url = await getUrlFromQuery(query);
   return new Promise((resolve, reject) => {
     child_process.execFile(
-      "yt-dlp",
+      getYtDlpBinaryPath(),
       ["--dump-single-json", "--no-warnings", url],
       (error, stdout) => {
         if (error) {
