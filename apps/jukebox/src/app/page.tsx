@@ -2,16 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "@/components/ui/input-group";
+import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { UpNextList } from "@/components/up-next-list";
 import {
-  ClipboardPaste,
   ListMusic,
   LogOut,
   Pause,
@@ -330,31 +324,17 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <div className="flex gap-2">
-                <InputGroup>
-                  <InputGroupInput
-                    type="text"
-                    placeholder="URL or search query"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        handleAddToQueue();
-                      }
-                    }}
-                  />
-                  <InputGroupAddon align="inline-end">
-                    <InputGroupButton
-                      size="icon-xs"
-                      onClick={() => {
-                        navigator.clipboard.readText().then((text) => {
-                          setQuery(text);
-                        });
-                      }}
-                    >
-                      <ClipboardPaste />
-                    </InputGroupButton>
-                  </InputGroupAddon>
-                </InputGroup>
+                <Input
+                  type="text"
+                  placeholder="URL or search query"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleAddToQueue();
+                    }
+                  }}
+                />
                 <Button onClick={handleAddToQueue}>
                   <Plus />
                   Add
