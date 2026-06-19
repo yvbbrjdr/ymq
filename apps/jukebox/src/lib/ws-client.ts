@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 import type { WsMessage } from "../types/ws-message";
 
 export class WsClient extends EventTarget {
@@ -61,7 +63,7 @@ export class WsClient extends EventTarget {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
       throw new Error("WebSocket not connected");
     }
-    const requestId = crypto.randomUUID();
+    const requestId = uuidv4();
     message.id = requestId;
     this.ws.send(JSON.stringify(message));
     return new Promise<void>((resolve, reject) => {
@@ -69,7 +71,7 @@ export class WsClient extends EventTarget {
       setTimeout(() => {
         if (this.inflightCommands.has(requestId)) {
           this.inflightCommands.delete(requestId);
-          reject(`WebSocket command timed out: ${message}`);
+          reject(`WebSocket command timed out: ${JSON.stringify(message)}`);
         }
       }, timeout);
     });
