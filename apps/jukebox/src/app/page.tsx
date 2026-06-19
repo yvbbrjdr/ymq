@@ -55,6 +55,8 @@ export default function Home() {
   const [numPendingEnqueue, setNumPendingEnqueue] = useState<number>(0);
   const positionDragging = useRef<boolean>(false);
 
+  const cardGlowClass = "shadow-[12px_12px_32px_-20px_rgba(168,85,247,0.28)]";
+
   useEffect(() => {
     const savedUsername = localStorage.getItem("username");
     if (savedUsername) {
@@ -101,7 +103,7 @@ export default function Home() {
 
   return (
     <div className="container mx-auto px-4 my-4 lg:my-10 flex flex-col gap-4 lg:gap-8">
-      <Card className="px-6 py-4">
+      <Card className={`${cardGlowClass} px-6 py-4`}>
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-0 justify-between items-center">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
@@ -131,7 +133,7 @@ export default function Home() {
       </Card>
       <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 lg:gap-8">
         <div className="col-span-2">
-          <Card className="relative px-6 pt-6 pb-2">
+          <Card className={`${cardGlowClass} relative px-6 pt-6 pb-2`}>
             {mediaQueueStatus.nowPlaying?.thumbnail && (
               <>
                 <div
@@ -298,7 +300,7 @@ export default function Home() {
           </Card>
         </div>
         <div className="col-span-1 flex flex-col gap-4 lg:gap-8">
-          <Card>
+          <Card className={cardGlowClass}>
             <CardHeader>
               <h2 className="text-lg font-semibold">
                 Add to Queue
@@ -344,7 +346,7 @@ export default function Home() {
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className={cardGlowClass}>
             <CardHeader>
               <h2 className="text-lg font-semibold">Up Next</h2>
             </CardHeader>
