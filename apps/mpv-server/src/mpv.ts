@@ -6,6 +6,8 @@ import type Stream from "stream";
 export class MPV extends EventEmitter {
   private binaryPath: string;
   private socketPath: string;
+  private ytDlpBinaryPath: string;
+  private ytDlpCookiesFromBrowser: string | null;
   private mpvProcess: child_process.ChildProcessByStdio<
     null,
     null,
@@ -17,6 +19,9 @@ export class MPV extends EventEmitter {
     super();
     this.binaryPath = process.env.MPV_BINARY_PATH || "mpv";
     this.socketPath = process.env.MPV_SOCKET_PATH || "/tmp/mpv.sock";
+    this.ytDlpBinaryPath = process.env.YT_DLP_BINARY_PATH || "yt-dlp";
+    this.ytDlpCookiesFromBrowser =
+      process.env.YT_DLP_COOKIES_FROM_BROWSER || null;
     this.mpvProcess = null;
     this.ipcClient = null;
   }
@@ -32,9 +37,11 @@ export class MPV extends EventEmitter {
         "--input-ipc-server=" + this.socketPath,
         "--force-window=yes",
         "--fullscreen",
-        ...(process.env.YT_DLP_COOKIES_FROM_BROWSER
+        "--script-opts=ytdl_hook-ytdl_path=" + this.ytDlpBinaryPath,
+        ...(this.ytDlpCookiesFromBrowser
           ? [
-              `--ytdl-raw-options=cookies-from-browser=${process.env.YT_DLP_COOKIES_FROM_BROWSER}`,
+              "--ytdl-raw-options=cookies-from-browser=" +
+                this.ytDlpCookiesFromBrowser,
             ]
           : []),
       ],

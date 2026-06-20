@@ -15,7 +15,9 @@
     "build": "pnpm build:mpv-server && pnpm build:jukebox",
     "start:mpv-server": "cd apps/mpv-server && pnpm start",
     "start:jukebox": "cd apps/jukebox && pnpm start",
-    "start": "concurrently \"pnpm start:mpv-server\" \"pnpm start:jukebox\""
+    "start": "concurrently \"pnpm start:mpv-server\" \"pnpm start:jukebox\"",
+    "setup-env": "cd apps/setup && pnpm start",
+    "serve": "pnpm build && pnpm start"
   },
   "keywords": [],
   "author": "yvbbrjdr",
