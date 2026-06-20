@@ -161,6 +161,7 @@ export default function Home() {
                       src={mediaQueueStatus.nowPlaying.thumbnail}
                       className="w-full h-full object-cover"
                       title={mediaQueueStatus.nowPlaying.description}
+                      referrerPolicy="no-referrer"
                     />
                   </Link>
                 ) : (
