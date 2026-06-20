@@ -21,7 +21,14 @@ export const getMediaMetadata = async (
   return new Promise((resolve, reject) => {
     child_process.execFile(
       process.env.YT_DLP_BINARY_PATH || "yt-dlp",
-      ["--dump-single-json", "--no-warnings", url],
+      [
+        "--dump-single-json",
+        "--no-warnings",
+        url,
+        ...(process.env.YT_DLP_COOKIES_FROM_BROWSER
+          ? ["--cookies-from-browser", process.env.YT_DLP_COOKIES_FROM_BROWSER]
+          : []),
+      ],
       { maxBuffer: 1024 * 1024 * 10 },
       (error, stdout) => {
         if (error) {

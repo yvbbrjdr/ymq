@@ -32,6 +32,11 @@ export class MPV extends EventEmitter {
         "--input-ipc-server=" + this.socketPath,
         "--force-window=yes",
         "--fullscreen",
+        ...(process.env.YT_DLP_COOKIES_FROM_BROWSER
+          ? [
+              `--ytdl-raw-options=cookies-from-browser=${process.env.YT_DLP_COOKIES_FROM_BROWSER}`,
+            ]
+          : []),
       ],
       {
         stdio: ["ignore", "ignore", "pipe"],
