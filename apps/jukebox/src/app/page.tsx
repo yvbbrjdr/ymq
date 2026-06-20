@@ -166,7 +166,9 @@ export default function Home() {
                 ) : (
                   <div className="w-full h-full flex flex-col gap-2 items-center justify-center bg-gray-500/10">
                     <Tv className="text-gray-400 size-10" />
-                    <p className="text-gray-400">No media playing</p>
+                    <p className="text-gray-400 select-none">
+                      No media playing
+                    </p>
                   </div>
                 )}
               </div>
@@ -247,10 +249,13 @@ export default function Home() {
                     }}
                   />
                 </div>
-                <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center">
-                  <div />
+                <div className="flex justify-between lg:grid w-full lg:grid-cols-[1fr_auto_1fr] items-center">
+                  <div className="hidden lg:block" />
                   <div className="flex items-center justify-center">
-                    <Button variant="ghost" className="size-12 invisible" />
+                    <Button
+                      variant="ghost"
+                      className="size-12 hidden lg:block invisible"
+                    />
                     <Button
                       variant="ghost"
                       className="size-16"
@@ -350,7 +355,9 @@ export default function Home() {
               {mediaQueueStatus.queues.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-6 gap-1 rounded-xl border border-gray-500 bg-gray-500/10">
                   <ListMusic className="size-8 text-gray-400" />
-                  <p className="text-md text-gray-400">The queue is empty</p>
+                  <p className="text-md text-gray-400 select-none">
+                    The queue is empty
+                  </p>
                 </div>
               ) : (
                 <UpNextList
