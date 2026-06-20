@@ -27,6 +27,7 @@ export function UpNextListItem({
               src={item.thumbnail}
               className="absolute inset-0 w-full h-full object-cover"
               title={item.description}
+              referrerPolicy="no-referrer"
             />
             <div className="absolute bottom-0 right-0 px-1 mr-1 mb-1 rounded-sm bg-black/50 flex items-center justify-center">
               <p className="text-white text-xs">
