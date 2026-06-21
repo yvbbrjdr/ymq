@@ -125,7 +125,9 @@ const saveEnv = (env: Record<string, string>, filePath: string) => {
           `${key}="${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`,
       )
       .join("\n") + "\n";
-  fs.writeFileSync(path.join(projectRoot, filePath), content);
+  const fileAbsPath = path.join(projectRoot, filePath);
+  fs.writeFileSync(fileAbsPath, content);
+  console.log(`Saved environment variables to ${fileAbsPath}`);
 };
 
 const main = async () => {
